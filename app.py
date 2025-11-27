@@ -50,10 +50,13 @@ limiter = Limiter(
 
 # MongoDB connection with error handling
 try:
+    # Add tlsAllowInvalidCertificates for Render compatibility
     client = MongoClient(
         os.environ.get('MONGODB_URI'),
-        serverSelectionTimeoutMS=5000,
-        connectTimeoutMS=10000
+        serverSelectionTimeoutMS=30000,
+        connectTimeoutMS=30000,
+        tls=True,
+        tlsAllowInvalidCertificates=True
     )
     db = client.link_shortener
     urls_collection = db.urls
@@ -580,6 +583,7 @@ def privacy_policy():
 
 @app.route('/unshorten', methods=['GET', 'POST'])
 @limiter.limit("20 per minute")
+@csrf.exempt
 def unshorten_url():
     """Unshorten a URL to see the original destination"""
     if request.method == 'POST':
