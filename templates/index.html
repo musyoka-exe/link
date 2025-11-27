@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Shortener - Faster and Better than Bitly</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .input-group-btn-custom {
+            position: relative;
+        }
+        .copy-btn, .paste-btn {
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover, .paste-btn:hover {
+            transform: scale(1.05);
+        }
+        .copy-btn.copied {
+            background-color: #28a745 !important;
+            border-color: #28a745 !important;
+        }
+        .short-url-container {
+            background-color: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .short-url-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0d6efd;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-link-45deg"></i> Link Shortener
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('unshorten_url') }}">Unshorten</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('report_abuse') }}">Report Abuse</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('terms_of_service') }}">Terms</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('privacy_policy') }}">Privacy</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center mb-4">
+                    <i class="bi bi-link-45deg"></i> Link Shortener
+                </h1>
+                
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <form id="shorten-form">
+                            <div class="mb-3">
+                                <label for="url" class="form-label">Enter URL to shorten</label>
+                                <div class="input-group input-group-lg">
+                                    <input type="text" class="form-control" id="url" name="url" placeholder="example.com or https://example.com" required>
+                                    <button class="btn btn-outline-secondary paste-btn" type="button" id="paste-btn" title="Paste from clipboard">
+                                        <i class="bi bi-clipboard"></i> Paste
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">Works with or without http:// or https://</small>
+                                
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-scissors"></i> Shorten URL
+                            </button>
+                        </form>
+                        
+                        <div id="result" class="mt-4 d-none">
+
+                            <div class="short-url-container">
+                                <h5><i class="bi bi-check-circle-fill"></i> URL Successfully Shortened!</h5>
+                                <label class="form-label"><strong>Your Shortened URL:</strong></label>
+                                <div class="input-group input-group-lg">
+                                    <input type="text" class="form-control short-url-text" id="short-url-input" readonly>
+                                    <button class="btn btn-success copy-btn" type="button" id="copy-btn" title="Copy to clipboard">
+                                        <i class="bi bi-clipboard-check"></i> Copy
+                                    </button>
+                                </div>
+                                <small class="text-muted">Click the button to copy your short link</small>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <h5><i class="bi bi-qr-code"></i> QR Code</h5>
+                                <div id="qr-container" class="mb-3">
+                                    <img id="qr-code-img" src="" alt="QR Code" class="img-fluid mb-3" style="max-width: 250px;">
+                                    <br>
+                                    <a id="download-qr" class="btn btn-success" download="qr_code.png">
+                                        <i class="bi bi-download"></i> Download QR Code
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-success">
+                                
+                                <p class="mb-2">
+                                    <strong>Original URL:</strong><br>
+                                    <a href="#" id="original-url" target="_blank" class="text-break"></a>
+                                </p>
+                            </div>
+                            
+                            
+                            
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="button" class="btn btn-outline-primary" id="shorten-another">
+                                    <i class="bi bi-plus-circle"></i> Shorten Another URL
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="error-message" class="mt-4 d-none">
+                            <div class="alert alert-danger" id="error-text"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check"></i> Your links are shortened instantly. No registration required.
+                    </small>
+                    <br>
+                    <small class="form-text text-muted">We do not collect your data</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('shorten-form');
+            const urlInput = document.getElementById('url');
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error-message');
+            const pasteBtn = document.getElementById('paste-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const shortUrlInput = document.getElementById('short-url-input');
+            const shortenAnotherBtn = document.getElementById('shorten-another');
+
+            // Paste button functionality
+            pasteBtn.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    urlInput.value = text;
+                    urlInput.focus();
+                    
+                    // Visual feedback
+                    pasteBtn.innerHTML = '<i class="bi bi-check"></i> Pasted!';
+                    pasteBtn.classList.add('btn-success');
+                    pasteBtn.classList.remove('btn-outline-secondary');
+                    
+                    setTimeout(() => {
+                        pasteBtn.innerHTML = '<i class="bi bi-clipboard"></i> Paste';
+                        pasteBtn.classList.remove('btn-success');
+                        pasteBtn.classList.add('btn-outline-secondary');
+                    }, 2000);
+                } catch (err) {
+                    alert('Failed to read clipboard. Please paste manually or check browser permissions.');
+                    console.error('Failed to read clipboard:', err);
+                }
+            });
+
+            // Copy button functionality
+            copyBtn.addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(shortUrlInput.value);
+                    
+                    // Visual feedback
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    // Fallback for older browsers
+                    shortUrlInput.select();
+                    document.execCommand('copy');
+                    
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }
+            });
+
+            // Shorten another URL button
+            shortenAnotherBtn.addEventListener('click', function() {
+                resultDiv.classList.add('d-none');
+                errorDiv.classList.add('d-none');
+                urlInput.value = '';
+                urlInput.focus();
+            });
+
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const url = urlInput.value.trim();
+                
+                if (!url) {
+                    showError('Please enter a URL');
+                    return;
+                }
+
+                // Hide previous results
+                resultDiv.classList.add('d-none');
+                errorDiv.classList.add('d-none');
+
+                try {
+                    const formData = new FormData();
+                    formData.append('url', url);
+
+                    const response = await fetch('/shorten', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Display results
+                        document.getElementById('original-url').href = data.original_url;
+                        document.getElementById('original-url').textContent = data.original_url;
+                        
+                        shortUrlInput.value = data.short_url;
+                        
+                        document.getElementById('qr-code-img').src = data.qr_code_path;
+                        document.getElementById('download-qr').href = data.qr_code_path;
+                        
+                        resultDiv.classList.remove('d-none');
+                        
+                        // Scroll to results
+                        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } else {
+                        showError(data.error || 'An error occurred');
+                    }
+                } catch (error) {
+                    showError('Failed to shorten URL. Please try again.');
+                    console.error('Error:', error);
+                }
+            });
+
+            function showError(message) {
+                document.getElementById('error-text').textContent = message;
+                errorDiv.classList.remove('d-none');
+                resultDiv.classList.add('d-none');
+            }
+        });
+    </script>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                <a href="{{ url_for('terms_of_service') }}" class="text-decoration-none">Terms</a> | 
+                <a href="{{ url_for('privacy_policy') }}" class="text-decoration-none">Privacy</a> | 
+                <a href="{{ url_for('report_abuse') }}" class="text-decoration-none">Report Abuse</a>
+            </p>
+            <p class="text-muted mb-0 mt-2">&copy; 2025 Link Shortener. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Link Shortener</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+        }
+        .sidebar .nav-link.active, .sidebar .nav-link:hover {
+            color: white;
+        }
+        .stat-card {
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        .main-content {
+            padding-top: 20px;
+        }
+        .table th {
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar d-md-block">
+                    <div class="p-3">
+                        <h5 class="text-white mb-4">Link Shortener Admin</h5>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_urls') }}"><i class="fas fa-link me-2"></i>URLs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_analytics') }}"><i class="fas fa-chart-bar me-2"></i>Analytics</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Dashboard</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a href="{{ url_for('admin_urls') }}" class="btn btn-sm btn-outline-secondary">Manage URLs</a>
+                            <a href="{{ url_for('admin_analytics') }}" class="btn btn-sm btn-outline-secondary">View Analytics</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card shadow-sm h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total URLs</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_urls }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-link fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card shadow-sm h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Clicks</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_clicks }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-mouse-pointer fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card shadow-sm h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Today's Clicks</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ today_clicks }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card shadow-sm h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Avg. Clicks/URL</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {% if total_urls > 0 %}
+                                                {{ "%.2f"|format(total_clicks / total_urls) }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top URLs by Clicks -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Top URLs by Clicks</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="topUrlsTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Short Code</th>
+                                                <th>Original URL</th>
+                                                <th>Clicks</th>
+                                                <th>Created</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for url in top_urls %}
+                                            <tr>
+                                                <td><a href="{{ url_for('redirect_to_url', short_code=url.short_code) }}" target="_blank">{{ url.short_code }}</a></td>
+                                                <td><a href="{{ url.original_url }}" target="_blank">{{ url.original_url|truncate(40) }}</a></td>
+                                                <td>{{ url.click_count }}</td>
+                                                <td>{{ url.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% if top_urls|length == 0 %}
+                                            <tr>
+                                                <td colspan="4" class="text-center">No URLs created yet</td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

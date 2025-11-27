@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abuse Reports - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_urls') }}">URLs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_analytics') }}">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('admin_reports') }}">
+                            Reports
+                            {% if pending_count > 0 %}
+                            <span class="badge bg-danger">{{ pending_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h2><i class="bi bi-flag-fill"></i> Abuse Reports</h2>
+                <p class="text-muted">Review and manage reported links</p>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-hourglass-split"></i> Pending
+                        </h5>
+                        <h2>{{ pending_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-check-circle"></i> Resolved
+                        </h5>
+                        <h2>{{ resolved_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-x-circle"></i> Dismissed
+                        </h5>
+                        <h2>{{ dismissed_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="row mb-3">
+            <div class="col">
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('admin_reports', status='all') }}" 
+                       class="btn btn-outline-primary {% if current_filter == 'all' %}active{% endif %}">
+                        All Reports
+                    </a>
+                    <a href="{{ url_for('admin_reports', status='pending') }}" 
+                       class="btn btn-outline-warning {% if current_filter == 'pending' %}active{% endif %}">
+                        Pending
+                    </a>
+                    <a href="{{ url_for('admin_reports', status='resolved') }}" 
+                       class="btn btn-outline-success {% if current_filter == 'resolved' %}active{% endif %}">
+                        Resolved
+                    </a>
+                    <a href="{{ url_for('admin_reports', status='dismissed') }}" 
+                       class="btn btn-outline-secondary {% if current_filter == 'dismissed' %}active{% endif %}">
+                        Dismissed
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="card">
+            <div class="card-body">
+                {% if reports %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Reported URL</th>
+                                <th>Original URL</th>
+                                <th>Reason</th>
+                                <th>Reporter</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in reports %}
+                            <tr>
+                                <td>
+                                    {% if report.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif report.status == 'resolved' %}
+                                    <span class="badge bg-success">Resolved</span>
+                                    {% elif report.status == 'dismissed' %}
+                                    <span class="badge bg-secondary">Dismissed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <code>{{ report.short_url }}</code>
+                                </td>
+                                <td>
+                                    <a href="{{ report.original_url }}" target="_blank" class="text-break">
+                                        {{ report.original_url[:50] }}{% if report.original_url|length > 50 %}...{% endif %}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ report.reason }}</span>
+                                </td>
+                                <td>
+                                    {% if report.reporter_email %}
+                                    <small>{{ report.reporter_email }}</small>
+                                    {% else %}
+                                    <small class="text-muted">Anonymous</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ report.reported_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" 
+                                            onclick="viewReport('{{ report._id }}', '{{ report.short_url }}', '{{ report.original_url }}', '{{ report.reason }}', '{{ report.description }}', '{{ report.reporter_email or 'Anonymous' }}', '{{ report.reported_at.strftime('%Y-%m-%d %H:%M') }}', '{{ report.status }}', '{{ report.admin_notes or '' }}')">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                    <p class="text-muted mt-3">No reports found</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Detail Modal -->
+    <div class="modal fade" id="reportModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Report Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Status:</strong>
+                        <span id="report-status"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Shortened URL:</strong>
+                        <p><code id="report-short-url"></code></p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Original URL:</strong>
+                        <p><a id="report-original-url" target="_blank"></a></p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Reason:</strong>
+                        <p><span class="badge bg-info" id="report-reason"></span></p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Description:</strong>
+                        <p id="report-description"></p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Reporter:</strong>
+                        <p id="report-email"></p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Reported Date:</strong>
+                        <p id="report-date"></p>
+                    </div>
+                    <hr>
+                    <form id="update-report-form">
+                        <input type="hidden" id="report-id">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Update Status:</strong></label>
+                            <select class="form-select" id="report-status-update" required>
+                                <option value="pending">Pending</option>
+                                <option value="resolved">Resolved (Remove Link)</option>
+                                <option value="dismissed">Dismissed (Keep Link)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Admin Notes:</strong></label>
+                            <textarea class="form-control" id="report-admin-notes" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Update Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function viewReport(id, shortUrl, originalUrl, reason, description, email, date, status, adminNotes) {
+            document.getElementById('report-id').value = id;
+            document.getElementById('report-short-url').textContent = shortUrl;
+            document.getElementById('report-original-url').href = originalUrl;
+            document.getElementById('report-original-url').textContent = originalUrl;
+            document.getElementById('report-reason').textContent = reason;
+            document.getElementById('report-description').textContent = description;
+            document.getElementById('report-email').textContent = email;
+            document.getElementById('report-date').textContent = date;
+            document.getElementById('report-status-update').value = status;
+            document.getElementById('report-admin-notes').value = adminNotes;
+            
+            // Update status badge
+            let statusHtml = '';
+            if (status === 'pending') {
+                statusHtml = '<span class="badge bg-warning">Pending</span>';
+            } else if (status === 'resolved') {
+                statusHtml = '<span class="badge bg-success">Resolved</span>';
+            } else if (status === 'dismissed') {
+                statusHtml = '<span class="badge bg-secondary">Dismissed</span>';
+            }
+            document.getElementById('report-status').innerHTML = statusHtml;
+            
+            const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+            modal.show();
+        }
+
+        document.getElementById('update-report-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const reportId = document.getElementById('report-id').value;
+            const status = document.getElementById('report-status-update').value;
+            const adminNotes = document.getElementById('report-admin-notes').value;
+            
+            try {
+                const response = await fetch(`/admin/report/${reportId}/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `status=${status}&admin_notes=${encodeURIComponent(adminNotes)}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Report updated successfully!');
+                    location.reload();
+                } else {
+                    alert('Error updating report: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error updating report: ' + error);
+            }
+        });
+    </script>
+</body>
+</html>

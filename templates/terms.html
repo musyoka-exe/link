@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Link Shortener</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-link-45deg"></i> Link Shortener
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('unshorten_url') }}">Unshorten</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('report_abuse') }}">Report Abuse</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('terms_of_service') }}">Terms</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('privacy_policy') }}">Privacy</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h1 class="mb-4">Terms of Service</h1>
+                <p class="text-muted"><strong>Last Updated:</strong> November 26, 2024</p>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">1. Acceptance of Terms</h2>
+                        <p>By accessing and using Link Shortener ("Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our Service.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">2. Description of Service</h2>
+                        <p>Link Shortener provides URL shortening services that allow users to create shortened versions of long URLs. The Service generates QR codes for shortened links and provides basic analytics.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">3. Acceptable Use Policy</h2>
+                        <p>You agree not to use the Service to:</p>
+                        <ul>
+                            <li>Shorten URLs that link to illegal content, malware, viruses, or phishing sites</li>
+                            <li>Distribute spam, unwanted advertising, or promotional materials</li>
+                            <li>Violate any applicable laws or regulations</li>
+                            <li>Infringe upon intellectual property rights of others</li>
+                            <li>Harass, abuse, threaten, or incite violence against any individual or group</li>
+                            <li>Share content that is pornographic, obscene, or sexually explicit involving minors</li>
+                            <li>Promote terrorism, violence, hate speech, or discrimination</li>
+                            <li>Facilitate fraud, identity theft, or financial scams</li>
+                            <li>Impersonate any person or entity or misrepresent your affiliation</li>
+                            <li>Interfere with or disrupt the Service or servers connected to the Service</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">4. Content and Responsibility</h2>
+                        <p>You are solely responsible for the URLs you shorten and their destination content. We do not:</p>
+                        <ul>
+                            <li>Pre-screen, monitor, or approve content that you link to</li>
+                            <li>Take responsibility for the accuracy, legality, or quality of destination content</li>
+                            <li>Guarantee that shortened links will remain active indefinitely</li>
+                        </ul>
+                        <p>We reserve the right to remove any shortened link at our sole discretion without prior notice.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">5. Intellectual Property</h2>
+                        <p>The Service and its original content, features, and functionality are owned by Link Shortener and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">6. Link Expiration and Deletion</h2>
+                        <p>We reserve the right to:</p>
+                        <ul>
+                            <li>Delete inactive shortened links after a period of inactivity</li>
+                            <li>Remove links that violate these terms without prior notice</li>
+                            <li>Suspend or terminate access to the Service for violations</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">7. Reporting Abuse</h2>
+                        <p>If you believe a shortened link violates these terms or is being used for malicious purposes, please report it using our <a href="{{ url_for('report_abuse') }}">Report Abuse</a> form. We will investigate all reports and take appropriate action.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">8. Disclaimer of Warranties</h2>
+                        <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+                        <p>We do not warrant that:</p>
+                        <ul>
+                            <li>The Service will be uninterrupted, timely, secure, or error-free</li>
+                            <li>The results obtained from the Service will be accurate or reliable</li>
+                            <li>Any errors in the Service will be corrected</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">9. Limitation of Liability</h2>
+                        <p>IN NO EVENT SHALL LINK SHORTENER, ITS DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, DATA, USE, OR OTHER INTANGIBLE LOSSES, RESULTING FROM:</p>
+                        <ul>
+                            <li>Your access to or use of or inability to access or use the Service</li>
+                            <li>Any conduct or content of any third party on the Service</li>
+                            <li>Unauthorized access, use, or alteration of your content</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">10. Indemnification</h2>
+                        <p>You agree to indemnify, defend, and hold harmless Link Shortener and its affiliates from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from:</p>
+                        <ul>
+                            <li>Your use of the Service</li>
+                            <li>Your violation of these Terms</li>
+                            <li>Your violation of any rights of another party</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">11. Changes to Terms</h2>
+                        <p>We reserve the right to modify or replace these Terms at any time. Changes will be effective immediately upon posting. Your continued use of the Service after any changes constitutes acceptance of the new Terms.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">12. Governing Law</h2>
+                        <p>These Terms shall be governed by and construed in accordance with applicable international laws, without regard to conflict of law provisions.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="h4">13. Contact Information</h2>
+                        <p>If you have any questions about these Terms, please contact us through the <a href="{{ url_for('report_abuse') }}">Report</a> page or reach out to our support team.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> By using Link Shortener, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="bi bi-house"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                <a href="{{ url_for('terms_of_service') }}" class="text-decoration-none">Terms</a> | 
+                <a href="{{ url_for('privacy_policy') }}" class="text-decoration-none">Privacy</a> | 
+                <a href="{{ url_for('report_abuse') }}" class="text-decoration-none">Report Abuse</a>
+            </p>
+            <p class="text-muted mb-0 mt-2">&copy; 2024 Link Shortener. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
